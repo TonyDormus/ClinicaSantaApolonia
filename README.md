@@ -1,0 +1,1 @@
+Para crear la base de datos solo cambiar en el archivo .json el nombre del servidor y en sql server crear la base de datos con el mismo nombre que esta en el archivo .json luego en la consola del administrador de paquetes ejecutar este comando Update-Database
