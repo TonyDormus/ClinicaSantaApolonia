@@ -1,0 +1,42 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.VerCitasModel
+
+<h1>Ver Citas</h1>
+
+@if (Model.Citas == null || !Model.Citas.Any())
+{
+    <p>No hay citas registradas para ti.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Paciente</th>
+                <th>Tratamiento</th>
+                <th>Estado</th>
+                <th>Notas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cita in Model.Citas)
+            {
+                <tr>
+                    <td>@cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@cita.Paciente.Nombre @cita.Paciente.Apellido</td>
+                    <td>@cita.TipoTratamiento</td>
+                    <td>@cita.Estado</td>
+                    <td>@cita.Notas</td>
+                    <td>
+                        <a asp-page="./EditarCita" asp-route-id="@cita.Id" class="btn btn-primary">Editar</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@cita.Id" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar esta cita?');">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,135 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.FacturaModel
+
+<h1>Crear Factura</h1>
+
+@if (Model.Citas != null )
+{
+    <form method="post">
+        <div class="form-group">
+            <label for="Cita">Cita</label>
+            <select id="Cita" name="CitaId" class="form-control" required onchange="updateFacturaFields()">
+                <option value="">Seleccionar Cita</option>
+                @foreach (var cita in Model.Citas)
+                {
+                    <option value="@cita.Id"
+                            data-odontologo="@cita.Odontologo.Nombre @cita.Odontologo.Apellido"
+                            data-tratamiento="@cita.TipoTratamiento.Nombre"
+                            data-precio="@cita.TipoTratamiento.Precio"
+                            data-odontologoid="@cita.OdontologoId"
+                            data-pacienteid="@cita.PacienteId">
+                        @cita.FechaHora.ToString("dd/MM/yyyy HH:mm") - @cita.Paciente.Nombre @cita.Paciente.Apellido
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="Odontologo">Odontólogo</label>
+            <input type="text" id="Odontologo" name="Odontologo" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+            <label for="Tratamiento">Tratamiento</label>
+            <input type="text" id="Tratamiento" name="Tratamiento" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+            <label for="Monto">Monto</label>
+            <input type="number" id="Monto" name="Monto" class="form-control" step="0.01" required readonly />
+        </div>
+
+        <div class="form-group">
+            <label for="Descuento">Descuento (Opcional)</label>
+            <input type="number" id="Descuento" name="Descuento" class="form-control" step="0.01" />
+        </div>
+
+        <div class="form-group">
+            <label for="CantidadPagada">Cantidad Pagada</label>
+            <input type="number" id="CantidadPagada" name="CantidadPagada" class="form-control" step="0.01" required />
+        </div>
+
+        <div class="form-group">
+            <label for="CantidadDevuelta">Cantidad Devuelta</label>
+            <input type="number" id="CantidadDevuelta" name="CantidadDevuelta" class="form-control" step="0.01" required />
+        </div>
+
+        <!-- Campo oculto para OdontologoId -->
+        <input type="hidden" id="OdontologoId" name="OdontologoId" />
+        <!-- Campo oculto para PacienteId -->
+        <input type="hidden" id="PacienteId" name="PacienteId" />
+
+        <button type="submit" class="btn btn-primary">Guardar Factura</button>
+    </form>
+}
+else
+{
+    <p>No hay citas disponibles para seleccionar.</p>
+}
+
+@if (Model.ValidationErrors.Any())
+{
+    <div class="alert alert-danger mt-3">
+        @foreach (var error in Model.ValidationErrors)
+        {
+            <p>@error</p>
+        }
+    </div>
+}
+
+@if (Model.Facturas != null )
+{
+    <h2>Facturas Creadas</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Paciente</th>
+                <th>Odontólogo</th>
+                <th>Tratamiento</th>
+                <th>Precio</th>
+                <th>Descuento</th>
+                <th>Cantidad Pagada</th>
+                <th>Cantidad Devuelta</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var factura in Model.Facturas)
+            {
+                <tr>
+                    <td>@factura.Cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@factura.Cita.Paciente.Nombre @factura.Cita.Paciente.Apellido</td>
+                    <td>@factura.Cita.Odontologo.Nombre @factura.Cita.Odontologo.Apellido</td>
+                    <td>@factura.Cita.TipoTratamiento.Nombre</td>
+                    <td>@factura.PrecioTratamiento.ToString("C")</td>
+                    <td>@factura.Descuento?.ToString("C")</td>
+                    <td>@factura.CantidadPagada.ToString("C")</td>
+                    <td>@factura.MontoDevuelto.ToString("C")</td>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@factura.Id" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section Scripts {
+    <script>
+        function updateFacturaFields() {
+            var select = document.getElementById("Cita");
+            var selectedOption = select.options[select.selectedIndex];
+            var odontologo = selectedOption.getAttribute("data-odontologo");
+            var tratamiento = selectedOption.getAttribute("data-tratamiento");
+            var precio = selectedOption.getAttribute("data-precio");
+            var odontologoId = selectedOption.getAttribute("data-odontologoid");
+            var pacienteId = selectedOption.getAttribute("data-pacienteid");
+
+            document.getElementById("Odontologo").value = odontologo;
+            document.getElementById("Tratamiento").value = tratamiento;
+            document.getElementById("Monto").value = precio ? parseFloat(precio).toFixed(2) : "";
+            document.getElementById("OdontologoId").value = odontologoId;
+            document.getElementById("PacienteId").value = pacienteId;
+        }
+    </script>
+}

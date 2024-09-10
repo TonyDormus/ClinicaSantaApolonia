@@ -1,0 +1,104 @@
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+
+/* Estilo para los botones de enlace en el formulario de inicio de sesión */
+.btn-link {
+    font-size: 1rem; /* Tamaño de fuente */
+    text-decoration: none; /* Sin subrayado */
+    padding: 0; /* Sin padding adicional */
+    border-radius: 0.25rem; /* Bordes redondeados */
+}
+
+    .btn-link:hover {
+        text-decoration: underline; /* Subrayado en hover */
+    }
+
+.text-primary {
+    color: #007bff; /* Color primario de Bootstrap */
+}
+
+.text-center {
+    text-align: center; /* Centra el texto */
+}
+
+.mt-4 {
+    margin-top: 1.5rem; /* Espaciado superior */
+}
+
+
+
+/* Asegúrate de incluir el estilo de Bootstrap en tu proyecto */
+
+.nav-item {
+    margin: 5px 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+    .nav-link:hover {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+
+    .nav-link i {
+        margin-right: 8px;
+    }
+
+/* Estilos específicos para los botones de los roles */
+.btn-outline-primary {
+    border-color: #0d6efd;
+    color: #0d6efd;
+}
+
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+.btn-outline-success {
+    border-color: #198754;
+    color: #198754;
+}
+
+    .btn-outline-success:hover {
+        background-color: #198754;
+        color: white;
+    }
+
+.btn-outline-info {
+    border-color: #0dcaf0;
+    color: #0dcaf0;
+}
+
+    .btn-outline-info:hover {
+        background-color: #0dcaf0;
+        color: white;
+    }

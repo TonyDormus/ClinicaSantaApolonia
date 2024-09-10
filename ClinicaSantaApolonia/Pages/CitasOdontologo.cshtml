@@ -1,0 +1,109 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.CitasOdontologoModel
+
+<h1>Citas del Odontólogo</h1>
+<!-- Mensaje de éxito -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        <p>@Model.ErrorMessage</p>
+    </div>
+}
+else
+{
+    @if (Model.Citas == null || !Model.Citas.Any())
+    {
+        <p>No hay citas registradas para ti.</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Paciente</th>
+                    <th>Tratamiento</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th>Notas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cita in Model.Citas)
+                {
+                    <tr>
+                        <td>@cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@cita.Paciente.Nombre @cita.Paciente.Apellido</td>
+                        <td>@cita.TipoTratamiento.Nombre</td>
+                        <td>@cita.TipoTratamiento.Precio.ToString("C")</td>
+                        <td>@cita.Estado</td>
+                        <td>@cita.Notas</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal"
+                                    onclick="populateEditForm(@cita.Id, '@cita.FechaHora.ToString("yyyy-MM-ddTHH:mm")', '@cita.Estado', '@cita.Notas')">
+                                Editar
+                            </button>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@cita.Id" style="display:inline;">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar esta cita?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+
+<!-- Modal para editar cita -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Cita</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="EditCitaId" name="CitaId" />
+                    <div class="form-group">
+                        <label for="EditFechaHora">Fecha y Hora</label>
+                        <input type="datetime-local" id="EditFechaHora" name="FechaHora" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditEstado">Estado</label>
+                        <input type="text" id="EditEstado" name="Estado" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditNotas">Notas</label>
+                        <textarea id="EditNotas" name="Notas" class="form-control"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts necesarios para el funcionamiento del modal -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function populateEditForm(id, fechaHora, estado, notas) {
+        document.getElementById('EditCitaId').value = id;
+        document.getElementById('EditFechaHora').value = fechaHora;
+        document.getElementById('EditEstado').value = estado;
+        document.getElementById('EditNotas').value = notas;
+    }
+</script>

@@ -1,0 +1,57 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="login-form">
+                    <h1>@ViewData["Title"]</h1>
+                    <form id="account" method="post">
+                        <hr />
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
+                            <label asp-for="Input.Email">Correo</label>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="contraseña" />
+                            <label asp-for="Input.Password">Contraseña</label>
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input asp-for="Input.Recordarme" class="form-check-input" id="recordarme" />
+                            <label asp-for="Input.Recordarme" class="form-check-label" for="recordarme">
+                                @Html.DisplayNameFor(m => m.Input.Recordarme)
+                            </label>
+                        </div>
+                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Iniciar Sesión</button>
+                        <div class="mt-4 text-center">
+                            <p>
+                                <a id="forgot-password" asp-page="./ForgotPassword" class="btn btn-link text-primary">Olvido su Contraseña?</a>
+                            </p>
+                            <p>
+                                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-link text-primary">Registrarme</a>
+                            </p>
+                            
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    }
+</body>
+</html>

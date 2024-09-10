@@ -1,0 +1,229 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.ManageOdontologosModel
+
+<h1>Gestión de Odontólogos</h1>
+
+@if (Model.Odontologos.Count == 0)
+{
+    <p>No hay odontólogos registrados.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Especialidad</th>
+                <th>Email</th>
+                <th>Horarios</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var odontologo in Model.Odontologos)
+            {
+                <tr>
+                    <td>@odontologo.Nombre</td>
+                    <td>@odontologo.Apellido</td>
+                    <td>@odontologo.Especialidad</td>
+                    <td>@odontologo.Email</td>
+                    <td>
+                        <ul>
+                            @foreach (var horario in odontologo.OdontologoHorarios)
+                            {
+                                @foreach (var detalle in horario.Detalles)
+                                {
+                                    <li>
+                                        @Model.GetSpanishDayName(detalle.DiaSemana): @detalle.HoraInicio - @detalle.HoraFin
+                                        <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editHorarioModal"
+                                                onclick="populateHorarioEditForm(@detalle.Id, '@detalle.FechaInicio.ToString("yyyy-MM-dd")', '@detalle.FechaFin.ToString("yyyy-MM-dd")', '@detalle.HoraInicio', '@detalle.HoraFin')">
+                                            Editar
+                                        </button>
+                                        <form method="post" asp-page-handler="DeleteHorario" asp-route-id="@detalle.Id" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este horario?');">Eliminar</button>
+                                        </form>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <!-- Botón que abre el modal de edición -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal"
+                                onclick="populateEditForm(@odontologo.Id, '@odontologo.Nombre', '@odontologo.Apellido', '@odontologo.Especialidad', '@odontologo.Email')">
+                            Editar
+                        </button>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@odontologo.Id" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este odontólogo?');">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Agregar Nuevo Odontólogo</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="Nombre">Nombre</label>
+        <input type="text" id="Nombre" name="Nombre" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Apellido">Apellido</label>
+        <input type="text" id="Apellido" name="Apellido" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Especialidad">Especialidad</label>
+        <input type="text" id="Especialidad" name="Especialidad" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Email">Correo Electrónico</label>
+        <input type="email" id="Email" name="Email" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Password">Contraseña</label>
+        <input type="password" id="Password" name="Password" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-success">Agregar Odontólogo</button>
+</form>
+
+<h2>Agregar Nuevo Horario de Odontólogo</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="OdontologoId">Odontólogo</label>
+        <select id="OdontologoId" name="OdontologoId" class="form-control" required>
+            <option value="">Seleccionar Odontólogo</option>
+            @foreach (var odontologo in Model.Odontologos)
+            {
+                <option value="@odontologo.Id">@odontologo.Nombre @odontologo.Apellido</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="FechaInicio">Fecha de Inicio</label>
+        <input type="date" id="FechaInicio" name="FechaInicio" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="FechaFin">Fecha de Fin</label>
+        <input type="date" id="FechaFin" name="FechaFin" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="HoraInicio">Hora de Inicio</label>
+        <input type="time" id="HoraInicio" name="HoraInicio" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="HoraFin">Hora de Fin</label>
+        <input type="time" id="HoraFin" name="HoraFin" class="form-control" required />
+    </div>
+
+    <button type="submit" name="action" value="createHorario" class="btn btn-success">Agregar Horario</button>
+</form>
+
+<!-- Modal para editar odontólogo -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Odontólogo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="EditOdontologoId" name="OdontologoId" />
+                    <div class="form-group">
+                        <label for="EditNombre">Nombre</label>
+                        <input type="text" id="EditNombre" name="Nombre" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditApellido">Apellido</label>
+                        <input type="text" id="EditApellido" name="Apellido" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditEspecialidad">Especialidad</label>
+                        <input type="text" id="EditEspecialidad" name="Especialidad" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditEmail">Correo Electrónico</label>
+                        <input type="email" id="EditEmail" name="Email" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditPassword">Nueva Contraseña (Opcional)</label>
+                        <input type="password" id="EditPassword" name="Password" class="form-control" />
+                        <small class="form-text text-muted">Dejar en blanco para mantener la contraseña actual.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar horario -->
+<div class="modal fade" id="editHorarioModal" tabindex="-1" aria-labelledby="editHorarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editHorarioModalLabel">Editar Horario</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="EditHorario">
+                    <input type="hidden" id="EditHorarioId" name="HorarioDetalleId" />
+                    <div class="form-group">
+                        <label for="EditFechaInicio">Fecha de Inicio</label>
+                        <input type="date" id="EditFechaInicio" name="FechaInicio" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditFechaFin">Fecha de Fin</label>
+                        <input type="date" id="EditFechaFin" name="FechaFin" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditHoraInicio">Hora de Inicio</label>
+                        <input type="time" id="EditHoraInicio" name="HoraInicio" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditHoraFin">Hora de Fin</label>
+                        <input type="time" id="EditHoraFin" name="HoraFin" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+ 
+
+    function populateEditForm(id, nombre, apellido, especialidad, email) {
+        document.getElementById('EditOdontologoId').value = id;
+        document.getElementById('EditNombre').value = nombre;
+        document.getElementById('EditApellido').value = apellido;
+        document.getElementById('EditEspecialidad').value = especialidad;
+        document.getElementById('EditEmail').value = email;
+        document.getElementById('EditContrasena').value = ''; // Dejar en blanco para no cambiar la contraseña
+    }
+
+    function populateHorarioEditForm(id, fechaInicio, fechaFin, horaInicio, horaFin) {
+        document.getElementById('EditHorarioId').value = id;
+        document.getElementById('EditFechaInicio').value = fechaInicio;
+        document.getElementById('EditFechaFin').value = fechaFin;
+        document.getElementById('EditHoraInicio').value = horaInicio;
+        document.getElementById('EditHoraFin').value = horaFin;
+    }
+</script>
+
+<!-- Scripts necesarios para el funcionamiento del modal -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

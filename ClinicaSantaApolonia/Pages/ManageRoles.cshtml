@@ -1,0 +1,101 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.ManageRolesModel
+@{
+    ViewData["Title"] = "Gestión de Roles";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.Roles.Count == 0)
+{
+    <p>No hay roles disponibles.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rol</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model.Roles)
+            {
+                <tr>
+                    <td>@role.Name</td>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editRoleModal"
+                                onclick="populateEditForm('@role.Id', '@role.Name')">
+                            Editar
+                        </button>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@role.Id" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este rol?');">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<!-- Modal para editar rol -->
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRoleModalLabel">Editar Rol</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="EditRoleId" name="id" />
+                    <div class="form-group">
+                        <label for="EditRoleName">Nombre del Rol</label>
+                        <input type="text" id="EditRoleName" name="roleName" class="form-control" required />
+                    </div>
+
+                    <!-- Nueva sección para asignar permisos -->
+                    <div class="form-group">
+                        <label>Permisos de Acceso</label>
+                        @foreach (var pagina in Model.PaginasDisponibles)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="permisos" value="@pagina"
+                                       id="permiso_@pagina" @(Model.PermisosAsignados.Contains(pagina) ? "checked" : "")>
+                                <label class="form-check-label" for="permiso_@pagina">
+                                    @pagina
+                                </label>
+                            </div>
+                        }
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2>Crear Nuevo Rol</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="RoleName">Nombre del Rol</label>
+        <input type="text" id="RoleName" name="RoleName" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-success">Crear Rol</button>
+</form>
+
+<!-- Scripts necesarios para el funcionamiento del modal -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function populateEditForm(id, roleName) {
+        document.getElementById('EditRoleId').value = id;
+        document.getElementById('EditRoleName').value = roleName;
+    }
+</script>

@@ -1,0 +1,212 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.MisCitasModel
+
+<h1>Gestión de Citas</h1>
+
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger mt-3">
+        <p>@Model.ErrorMessage</p>
+    </div>
+}
+else
+{
+    @if (Model.Odontologos != null && Model.NotasTratamientos != null )
+    {
+        <form method="post">
+            <div class="form-group">
+                <label for="Odontologo">Odontólogo</label>
+                <select id="Odontologo" name="OdontologoId" class="form-control" required>
+                    <option value="">Seleccionar Odontólogo</option>
+                    @foreach (var odontologo in Model.Odontologos)
+                    {
+                        <option value="@odontologo.Id">@odontologo.Nombre @odontologo.Apellido</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="TipoTratamiento">Tipo de Tratamiento</label>
+                <select id="TipoTratamiento" name="TipoTratamientoId" class="form-control" required onchange="updatePrice()">
+                    <option value="">Seleccionar Tipo de Tratamiento</option>
+                    @foreach (var tratamiento in Model.NotasTratamientos)
+                    {
+                        <option value="@tratamiento.Id" data-precio="@tratamiento.Precio">@tratamiento.Nombre</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Precio">Precio</label>
+                <input type="text" id="Precio" name="Precio" class="form-control" readonly
+                       value="@ViewData["Precio"]?.ToString()" />
+            </div>
+
+
+            <div class="form-group">
+                <label for="FechaHora">Fecha y Hora</label>
+                <input type="datetime-local" id="FechaHora" name="FechaHora" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+                <label for="Notas">Notas</label>
+                <textarea id="Notas" name="Notas" class="form-control"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Crear Cita</button>
+        </form>
+    }
+    else
+    {
+        <p>No se puede mostrar el formulario. Verifique que todos los datos estén disponibles.</p>
+    }
+
+    @if (Model.Citas != null && Model.Citas.Any())
+    {
+        <h2>Mis Citas Programadas</h2>
+        <table class="table table-striped mt-3">
+            <!-- Tabla de citas programadas -->
+            <thead>
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Odontólogo</th>
+                    <th>Tipo de Tratamiento</th>
+                    <th>Precio</th>
+                    <th>Notas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cita in Model.Citas)
+                {
+                    <tr>
+                        <td>@cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@cita.Odontologo.Nombre @cita.Odontologo.Apellido</td>
+                        <td>@cita.TipoTratamiento.Nombre</td>
+                        <td>@cita.TipoTratamiento.Precio.ToString("C")</td>
+                        <td>@cita.Notas</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
+                                    onclick="populateEditForm(@cita.Id, '@cita.FechaHora.ToString("yyyy-MM-ddTHH:mm")', '@cita.NotasTratamientoId', '@cita.Notas', '@cita.TipoTratamiento.Precio')">
+                                Editar
+                            </button>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@cita.Id" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de que desea eliminar esta cita?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No hay citas disponibles.</p>
+    }
+
+    <!-- Modal para editar cita -->
+    @if (Model.NotasTratamientos != null )
+    {
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <!-- Contenido del modal -->
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Cita</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" asp-page-handler="Edit">
+                            <input type="hidden" id="EditCitaId" name="CitaId" />
+                            <div class="form-group">
+                                <label for="EditFechaHora">Fecha y Hora</label>
+                                <input type="datetime-local" id="EditFechaHora" name="FechaHora" class="form-control" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="EditTipoTratamiento">Tipo de Tratamiento</label>
+                                <select id="EditTipoTratamiento" name="TipoTratamientoId" class="form-control" required>
+                                    @foreach (var tratamiento in Model.NotasTratamientos)
+                                    {
+                                        <option value="@tratamiento.Id" data-precio="@tratamiento.Precio">@tratamiento.Nombre</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="EditPrecio">Precio</label>
+                                <input type="text" id="EditPrecio" name="Precio" class="form-control" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label for="EditNotas">Notas</label>
+                                <textarea id="EditNotas" name="Notas" class="form-control"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>No se puede editar la cita. Verifique que todos los datos estén disponibles.</p>
+    }
+}
+
+<!-- Scripts necesarios para el funcionamiento del modal -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function updatePrice() {
+        var select = document.getElementById("TipoTratamiento");
+        var selectedOption = select.options[select.selectedIndex];
+        var precio = selectedOption.getAttribute("data-precio");
+        document.getElementById("Precio").value = precio ? parseFloat(precio).toFixed(2) : "";
+    }
+
+    // Este evento se asegura de que el precio se restablezca al volver a cargar la página
+    window.addEventListener('load', function () {
+        updatePrice(); // Esto actualizará el precio si ya hay un tratamiento seleccionado
+    });
+
+    document.getElementById("FechaHora").addEventListener("input", function () {
+        var input = this;
+        var date = new Date(input.value);
+
+        if (date.getDay() === 0) {
+            input.setCustomValidity("Solo se permiten citas de lunes a sábado.");
+        } else if (date.getDay() === 6 && (date.getHours() < 8 || date.getHours() >= 12)) {
+            input.setCustomValidity("Los sábados solo se permiten citas entre las 8:00 y las 12:00.");
+        } else if (date.getDay() !== 6 && (date.getHours() < 8 || date.getHours() >= 17)) {
+            input.setCustomValidity("Las citas solo se permiten entre las 8:00 y las 17:00 de lunes a viernes.");
+        } else {
+            input.setCustomValidity("");
+        }
+    });
+
+    // Scripts para el modal de edición
+    function populateEditForm(id, fechaHora, tipoTratamientoId, notas, precio) {
+        document.getElementById('EditCitaId').value = id;
+        document.getElementById('EditFechaHora').value = fechaHora;
+        document.getElementById('EditNotas').value = notas;
+
+        var select = document.getElementById('EditTipoTratamiento');
+        for (var i = 0; i < select.options.length; i++) {
+            if (select.options[i].value === tipoTratamientoId) {
+                select.selectedIndex = i;
+                document.getElementById('EditPrecio').value = precio ? parseFloat(precio).toFixed(2) : '';
+                break;
+            }
+        }
+    }
+
+    document.getElementById('EditTipoTratamiento').addEventListener('change', function () {
+        var select = this;
+        var selectedOption = select.options[select.selectedIndex];
+        var precio = selectedOption.getAttribute('data-precio');
+        document.getElementById('EditPrecio').value = precio ? parseFloat(precio).toFixed(2) : '';
+    });
+</script>
+

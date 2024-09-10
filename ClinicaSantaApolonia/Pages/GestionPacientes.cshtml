@@ -1,0 +1,180 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.ManagePatientsModel
+@{
+    ViewData["Title"] = "Gestión de Pacientes";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<!-- Mensaje de éxito -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<!-- Mensaje de error general -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Mensajes de validación de ModelState -->
+@if (!ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+
+<h2>Crear Nuevo Paciente</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="Nombre">Nombre</label>
+        <input type="text" id="Nombre" name="Nombre" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Apellido">Apellido</label>
+        <input type="text" id="Apellido" name="Apellido" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input type="email" id="Email" name="Email" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Telefono">Teléfono</label>
+        <input type="text" id="Telefono" name="Telefono" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Direccion">Dirección</label>
+        <input type="text" id="Direccion" name="Direccion" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="Contrasena">Contraseña</label>
+        <input type="password" id="Contrasena" name="Contrasena" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-success">Crear Paciente</button>
+ 
+</form>
+
+@if (ModelState.ErrorCount > 0)
+{
+    <div class="alert alert-danger mt-3">
+        @foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+@if (Model.Patients != null && Model.Patients.Count > 0)
+{
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model.Patients)
+            {
+                <tr>
+                    <td>@patient.Nombre</td>
+                    <td>@patient.Apellido</td>
+                    <td>@patient.Email</td>
+                    <td>@patient.Telefono</td>
+                    <td>@patient.Direccion</td>
+                    <td>
+                        <!-- Botón que abre el modal de edición -->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal"
+                                onclick="populateEditForm(@patient.Id, '@patient.Nombre', '@patient.Apellido', '@patient.Email', '@patient.Telefono', '@patient.Direccion')">
+                            Editar
+                        </button>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@patient.Id" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este paciente?');">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay pacientes disponibles.</p>
+}
+
+<!-- Modal para editar paciente -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Paciente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="EditPacienteId" name="PacienteId" />
+                    <div class="form-group">
+                        <label for="EditNombre">Nombre</label>
+                        <input type="text" id="EditNombre" name="Nombre" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditApellido">Apellido</label>
+                        <input type="text" id="EditApellido" name="Apellido" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditEmail">Email</label>
+                        <input type="email" id="EditEmail" name="Email" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditTelefono">Teléfono</label>
+                        <input type="text" id="EditTelefono" name="Telefono" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditDireccion">Dirección</label>
+                        <input type="text" id="EditDireccion" name="Direccion" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditContrasena">Nueva Contraseña (Opcional)</label>
+                        <input type="password" id="EditContrasena" name="Contrasena" class="form-control" />
+                        <small class="form-text text-muted">Dejar en blanco para mantener la contraseña actual.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts necesarios para el funcionamiento del modal -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function populateEditForm(id, nombre, apellido, email, telefono, direccion) {
+        document.getElementById('EditPacienteId').value = id;
+        document.getElementById('EditNombre').value = nombre;
+        document.getElementById('EditApellido').value = apellido;
+        document.getElementById('EditEmail').value = email;
+        document.getElementById('EditTelefono').value = telefono;
+        document.getElementById('EditDireccion').value = direccion;
+        document.getElementById('EditContrasena').value = ''; // Dejar en blanco para no cambiar la contraseña
+    }
+</script>

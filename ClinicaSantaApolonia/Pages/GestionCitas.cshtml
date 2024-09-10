@@ -1,0 +1,106 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.ManageAppointmentsModel
+
+<h1>Gestión de Citas</h1>
+
+@if (Model.ValidationErrors.Any())
+{
+    <div class="alert alert-danger mt-3">
+        @foreach (var error in Model.ValidationErrors)
+        {
+            <p>@error</p>
+        }
+    </div>
+}
+else
+{
+    @if (Model.Odontologos == null || Model.NotasTratamientos == null || Model.Pacientes == null)
+    {
+        <p>No hay citas disponibles este dia a esta hora.</p>
+    }
+    else
+    {
+        <form method="post">
+            <div class="form-group">
+                <label for="Paciente">Paciente</label>
+                <select id="Paciente" name="PacienteId" class="form-control" required>
+                    <option value="">Seleccionar Paciente</option>
+                    @foreach (var paciente in Model.Pacientes)
+                    {
+                        <option value="@paciente.Id">@paciente.Nombre @paciente.Apellido</option>
+                    }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Odontologo">Odontólogo</label>
+                <select id="Odontologo" name="OdontologoId" class="form-control" required>
+                    <option value="">Seleccionar Odontólogo</option>
+                    @foreach (var odontologo in Model.Odontologos)
+                    {
+                        <option value="@odontologo.Id">@odontologo.Nombre @odontologo.Apellido</option>
+                    }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="TipoTratamiento">Tipo de Tratamiento</label>
+                <select id="TipoTratamiento" name="TipoTratamientoId" class="form-control" required onchange="updatePrice()">
+                    <option value="">Seleccionar Tipo de Tratamiento</option>
+                    @foreach (var tratamiento in Model.NotasTratamientos)
+                    {
+                        <option value="@tratamiento.Id" data-precio="@tratamiento.Precio">@tratamiento.Nombre</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="Precio">Precio</label>
+                <input type="text" id="Precio" name="Precio" class="form-control" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="FechaHora">Fecha y Hora</label>
+                <input type="datetime-local" id="FechaHora" name="FechaHora" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+                <label for="Notas">Notas</label>
+                <textarea id="Notas" name="Notas" class="form-control"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Crear Cita</button>
+        </form>
+    }
+}
+
+<script>
+    function updatePrice() {
+        var select = document.getElementById("TipoTratamiento");
+        var selectedOption = select.options[select.selectedIndex];
+        var precio = selectedOption.getAttribute("data-precio");
+        document.getElementById("Precio").value = precio ? parseFloat(precio).toFixed(2) : "";
+    }
+
+    // Este evento se asegura de que el precio se restablezca al volver a cargar la página
+    window.addEventListener('load', function () {
+        updatePrice(); // Esto actualizará el precio si ya hay un tratamiento seleccionado
+    });
+
+    document.getElementById("FechaHora").addEventListener("input", function () {
+        var input = this;
+        var date = new Date(input.value);
+
+        if (date.getDay() === 0) {
+            input.setCustomValidity("Solo se permiten citas de lunes a sábado.");
+        } else if (date.getDay() === 6 && (date.getHours() < 8 || date.getHours() >= 12)) {
+            input.setCustomValidity("Los sábados solo se permiten citas entre las 8:00 y las 12:00.");
+        } else if (date.getDay() !== 6 && (date.getHours() < 8 || date.getHours() >= 17)) {
+            input.setCustomValidity("Las citas solo se permiten entre las 8:00 y las 17:00 de lunes a viernes.");
+        } else {
+            input.setCustomValidity("");
+        }
+    });
+</script>

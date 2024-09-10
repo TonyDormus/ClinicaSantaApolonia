@@ -1,0 +1,34 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Bienvenido a Clínica Santa Apolonia";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Bienvenido a Clínica Santa Apolonia</h1>
+    <p>En Clínica Santa Apolonia, nos dedicamos a ofrecerte el mejor cuidado dental en un entorno cómodo y profesional.</p>
+    <p>Explora nuestros servicios y conoce a nuestro equipo de especialistas:</p>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="~/images/odontologia.jpg" class="card-img-top" alt="Servicios de Odontología">
+                <div class="card-body">
+                    <h5 class="card-title">Servicios de Odontología</h5>
+                    <p class="card-text">Ofrecemos una amplia gama de tratamientos dentales para cuidar de tu salud bucal.</p>
+                    <a href="/Servicios" class="btn btn-primary">Ver Servicios</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="~/images/equipo.jpg" class="card-img-top" alt="Nuestro Equipo">
+                <div class="card-body">
+                    <h5 class="card-title">Conoce a Nuestro Equipo</h5>
+                    <p class="card-text">Nuestro equipo está compuesto por profesionales altamente capacitados para ofrecerte el mejor cuidado.</p>
+                    <a href="/Equipo" class="btn btn-primary">Conocer Equipo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p>Para más información, no dudes en <a href="/Contacto">contactarnos</a>.</p>
+</div>

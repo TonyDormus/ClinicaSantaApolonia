@@ -1,0 +1,102 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.NotasTratamientoModel
+@{
+    ViewData["Title"] = "Tratamientos";
+}
+
+<h1>@ViewData["Title"]</h1>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+@if (Model.Tratamientos.Count == 0)
+{
+    <p>No hay notas de tratamiento disponibles.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tratamiento</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tratamiento in Model.Tratamientos)
+            {
+                <tr>
+                    <td>@tratamiento.Nombre</td>
+                    <td>@tratamiento.Precio.ToString("C")</td>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal"
+                                onclick="populateEditForm(@tratamiento.Id, '@tratamiento.Nombre', @tratamiento.Precio)">
+                            Editar
+                        </button>
+                        <form method="post" asp-page-handler="Delete" style="display:inline;">
+                            <input type="hidden" name="TratamientoId" value="@tratamiento.Id" />
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Agregar Nuevo Tratamiento</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="NuevoTratamiento">Nombre del Tratamiento</label>
+        <input type="text" id="NuevoTratamiento" name="NuevoTratamiento.Nombre" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label for="NuevoPrecio">Precio del Tratamiento</label>
+        <input type="number" id="NuevoPrecio" name="NuevoTratamiento.Precio" class="form-control" required step="0.01" />
+    </div>
+    <button type="submit" class="btn btn-success">Agregar Tratamiento</button>
+</form>
+
+<!-- Modal para editar tratamiento -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Tratamiento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="EditTratamientoId" name="TratamientoId" />
+                    <div class="form-group">
+                        <label for="EditNombre">Nombre del Tratamiento</label>
+                        <input type="text" id="EditNombre" name="NuevoTratamiento.Nombre" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="EditPrecio">Precio del Tratamiento</label>
+                        <input type="number" id="EditPrecio" name="NuevoTratamiento.Precio" class="form-control" required step="0.01" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts necesarios para el funcionamiento del modal -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function populateEditForm(id, nombre, precio) {
+        document.getElementById('EditTratamientoId').value = id;
+        document.getElementById('EditNombre').value = nombre;
+        document.getElementById('EditPrecio').value = precio;
+    }
+</script>

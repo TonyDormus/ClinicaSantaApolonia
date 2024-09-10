@@ -1,0 +1,160 @@
+﻿@page
+@model ClinicaSantaApolonia.Pages.ManageHistorialMedicoModel
+@{
+    ViewData["Title"] = "Gestión de Historial Médico";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<!-- Mensaje de éxito -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<!-- Mensaje de error -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Formulario para crear un nuevo historial médico -->
+<h2>Crear Nuevo Historial Médico</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="PacienteId">Paciente</label>
+        <select id="PacienteId" name="PacienteId" class="form-control" required>
+            @foreach (var paciente in Model.Pacientes)
+            {
+                <option value="@paciente.Id">@paciente.Nombre @paciente.Apellido</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="AntecedentesMedicos">Antecedentes Médicos</label>
+        <textarea id="AntecedentesMedicos" name="AntecedentesMedicos" class="form-control" required></textarea>
+    </div>
+    <div class="form-group">
+        <label for="TratamientosPrevios">Tratamientos Previos</label>
+        <textarea id="TratamientosPrevios" name="TratamientosPrevios" class="form-control" required></textarea>
+    </div>
+    <div class="form-group">
+        <label for="Alergias">Alergias</label>
+        <textarea id="Alergias" name="Alergias" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="NotasAdicionales">Notas Adicionales</label>
+        <textarea id="NotasAdicionales" name="NotasAdicionales" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Guardar Historial</button>
+</form>
+
+@if (Model.HistorialesMedicos != null && Model.HistorialesMedicos.Count > 0)
+{
+    <h2>Historiales Médicos</h2>
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>Antecedentes Médicos</th>
+                <th>Tratamientos Previos</th>
+                <th>Alergias</th>
+                <th>Notas Adicionales</th>
+                <th>Fecha de Creación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var historial in Model.HistorialesMedicos)
+            {
+                <tr>
+                    <td>@historial.Paciente.Nombre @historial.Paciente.Apellido</td>
+                    <td>@historial.AntecedentesMedicos</td>
+                    <td>@historial.TratamientosPrevios</td>
+                    <td>@historial.Alergias</td>
+                    <td>@historial.NotasAdicionales</td>
+                    <td>@historial.FechaCreacion</td>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal"
+                                onclick="populateEditForm(@historial.Id, @historial.PacienteId, '@historial.AntecedentesMedicos', '@historial.TratamientosPrevios', '@historial.Alergias', '@historial.NotasAdicionales')">
+                            Editar
+                        </button>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@historial.Id" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este historial médico?');">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay historiales médicos disponibles.</p>
+}
+
+<!-- Modal para editar historial médico -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Historial Médico</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Edit">
+                    <input type="hidden" id="EditHistorialId" name="HistorialId" />
+                    <div class="form-group">
+                        <label for="EditPacienteId">Paciente</label>
+                        <select id="EditPacienteId" name="PacienteId" class="form-control" required>
+                            @foreach (var paciente in Model.Pacientes)
+                            {
+                                <option value="@paciente.Id">@paciente.Nombre @paciente.Apellido</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="EditAntecedentesMedicos">Antecedentes Médicos</label>
+                        <textarea id="EditAntecedentesMedicos" name="AntecedentesMedicos" class="form-control" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="EditTratamientosPrevios">Tratamientos Previos</label>
+                        <textarea id="EditTratamientosPrevios" name="TratamientosPrevios" class="form-control" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="EditAlergias">Alergias</label>
+                        <textarea id="EditAlergias" name="Alergias" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="EditNotasAdicionales">Notas Adicionales</label>
+                        <textarea id="EditNotasAdicionales" name="NotasAdicionales" class="form-control"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts necesarios para el funcionamiento del modal -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Scripts para manejar el modal y el formulario de edición -->
+<script>
+    function populateEditForm(id, pacienteId, antecedentesMedicos, tratamientosPrevios, alergias, notasAdicionales) {
+        document.getElementById('EditHistorialId').value = id;
+        document.getElementById('EditPacienteId').value = pacienteId;
+        document.getElementById('EditAntecedentesMedicos').value = antecedentesMedicos;
+        document.getElementById('EditTratamientosPrevios').value = tratamientosPrevios;
+        document.getElementById('EditAlergias').value = alergias;
+        document.getElementById('EditNotasAdicionales').value = notasAdicionales;
+    }
+</script>
