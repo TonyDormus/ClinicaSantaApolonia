@@ -77,45 +77,72 @@ else
     </div>
 }
 
-@if (Model.Facturas != null )
+@if (Model.Facturas != null)
 {
     <h2>Facturas Creadas</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Fecha y Hora</th>
-                <th>Paciente</th>
-                <th>Odontólogo</th>
-                <th>Tratamiento</th>
-                <th>Precio</th>
-                <th>Descuento</th>
-                <th>Cantidad Pagada</th>
-                <th>Cantidad Devuelta</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var factura in Model.Facturas)
-            {
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
                 <tr>
-                    <td>@factura.Cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>@factura.Cita.Paciente.Nombre @factura.Cita.Paciente.Apellido</td>
-                    <td>@factura.Cita.Odontologo.Nombre @factura.Cita.Odontologo.Apellido</td>
-                    <td>@factura.Cita.TipoTratamiento.Nombre</td>
-                    <td>@factura.PrecioTratamiento.ToString("C")</td>
-                    <td>@factura.Descuento?.ToString("C")</td>
-                    <td>@factura.CantidadPagada.ToString("C")</td>
-                    <td>@factura.MontoDevuelto.ToString("C")</td>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@factura.Id" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
+                    <th>Fecha y Hora</th>
+                    <th>Paciente</th>
+                    <th>Odontólogo</th>
+                    <th>Tratamiento</th>
+                    <th>Precio</th>
+                    <th>Descuento</th>
+                    <th>Cantidad Pagada</th>
+                    <th>Cantidad Devuelta</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var factura in Model.Facturas)
+                {
+                    <tr>
+                        <td>@factura.Cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@factura.Cita.Paciente.Nombre @factura.Cita.Paciente.Apellido</td>
+                        <td>@factura.Cita.Odontologo.Nombre @factura.Cita.Odontologo.Apellido</td>
+                        <td>@factura.Cita.TipoTratamiento.Nombre</td>
+                        <td>@factura.PrecioTratamiento.ToString("C")</td>
+                        <td>@factura.Descuento?.ToString("C")</td>
+                        <td>@factura.CantidadPagada.ToString("C")</td>
+                        <td>@factura.MontoDevuelto.ToString("C")</td>
+                        <td>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@factura.Id" style="display:inline;">
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+                            <button type="button" class="btn btn-primary" onclick="printFactura(@factura.Id)">Imprimir</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+       @foreach (var factura in Model.Facturas)
+{
+    <div id="factura-@factura.Id" style="display:none;">
+        <h2>Factura</h2>
+        <p><strong>Clínica Santa Apolonia</strong></p>
+        <p>RUC: 123456789</p>
+        <p>Dirección: Jinotepe</p>
+        <p>Correo: contacto@clinicasantaapolonia.com</p>
+        <hr />
+        <p><strong>Fecha y Hora:</strong> @factura.Cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</p>
+        <p><strong>Paciente:</strong> @factura.Cita.Paciente.Nombre @factura.Cita.Paciente.Apellido</p>
+        <p><strong>Odontólogo:</strong> @factura.Cita.Odontologo.Nombre @factura.Cita.Odontologo.Apellido</p>
+        <p><strong>Tratamiento:</strong> @factura.Cita.TipoTratamiento.Nombre</p>
+        <p><strong>Precio:</strong> @factura.PrecioTratamiento.ToString("C")</p>
+        <p><strong>Descuento:</strong> @factura.Descuento?.ToString("C")</p>
+        <p><strong>Cantidad Pagada:</strong> @factura.CantidadPagada.ToString("C")</p>
+        <p><strong>Cantidad Devuelta:</strong> @factura.MontoDevuelto.ToString("C")</p>
+        <hr />
+        <p>Gracias por su preferencia.</p>
+    </div>
 }
 
-@section Scripts {
-    <script>
+<script>
+
         function updateFacturaFields() {
             var select = document.getElementById("Cita");
             var selectedOption = select.options[select.selectedIndex];
@@ -131,5 +158,20 @@ else
             document.getElementById("OdontologoId").value = odontologoId;
             document.getElementById("PacienteId").value = pacienteId;
         }
-    </script>
+
+    function printFactura(facturaId) {
+        var printContents = document.getElementById('factura-' + facturaId).innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+
+        window.print();
+
+        document.body.innerHTML = originalContents;
+    }
+</script>
+
+
 }
+
+

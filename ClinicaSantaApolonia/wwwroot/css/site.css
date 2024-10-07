@@ -102,3 +102,16 @@ body {
         background-color: #0dcaf0;
         color: white;
     }
+
+.horario-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.horario-actions {
+    display: flex;
+    gap: 5px;
+  
+}

@@ -65,45 +65,52 @@ else
     @if (Model.Citas != null && Model.Citas.Any())
     {
         <h2>Mis Citas Programadas</h2>
-        <table class="table table-striped mt-3">
-            <!-- Tabla de citas programadas -->
-            <thead>
-                <tr>
-                    <th>Fecha y Hora</th>
-                    <th>Odontólogo</th>
-                    <th>Tipo de Tratamiento</th>
-                    <th>Precio</th>
-                    <th>Notas</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var cita in Model.Citas)
-                {
+        <div class="table-responsive mt-3">
+            <table class="table table-striped table-bordered">
+                <!-- Tabla de citas programadas -->
+                <thead class="thead-dark">
                     <tr>
-                        <td>@cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td>@cita.Odontologo.Nombre @cita.Odontologo.Apellido</td>
-                        <td>@cita.TipoTratamiento.Nombre</td>
-                        <td>@cita.TipoTratamiento.Precio.ToString("C")</td>
-                        <td>@cita.Notas</td>
-                        <td>
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
-                                    onclick="populateEditForm(@cita.Id, '@cita.FechaHora.ToString("yyyy-MM-ddTHH:mm")', '@cita.NotasTratamientoId', '@cita.Notas', '@cita.TipoTratamiento.Precio')">
-                                Editar
-                            </button>
-                            <form method="post" asp-page-handler="Delete" asp-route-id="@cita.Id" style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de que desea eliminar esta cita?');">Eliminar</button>
-                            </form>
-                        </td>
+                        <th>Fecha y Hora</th>
+                        <th>Odontólogo</th>
+                        <th>Tipo de Tratamiento</th>
+                        <th>Precio</th>
+                        <th>Notas</th>
+                        <th>Acciones</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var cita in Model.Citas)
+                    {
+                        <tr>
+                            <td>@cita.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@cita.Odontologo.Nombre @cita.Odontologo.Apellido</td>
+                            <td>@cita.TipoTratamiento.Nombre</td>
+                            <td>@cita.TipoTratamiento.Precio.ToString("C")</td>
+                            <td>@cita.Notas</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2 justify-content-md-start justify-content-center">
+                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editModal"
+                                            onclick="populateEditForm(@cita.Id, '@cita.FechaHora.ToString("yyyy-MM-ddTHH:mm")', '@cita.NotasTratamientoId', '@cita.Notas', '@cita.TipoTratamiento.Precio')">
+                                        Editar
+                                    </button>
+                                    <form method="post" asp-page-handler="Delete" asp-route-id="@cita.Id" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de que desea eliminar esta cita?');">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
     else
     {
         <p>No hay citas disponibles.</p>
     }
+
+
+
 
     <!-- Modal para editar cita -->
     @if (Model.NotasTratamientos != null )

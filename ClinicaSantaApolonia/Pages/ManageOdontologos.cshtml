@@ -9,59 +9,73 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Especialidad</th>
-                <th>Email</th>
-                <th>Horarios</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var odontologo in Model.Odontologos)
-            {
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
                 <tr>
-                    <td>@odontologo.Nombre</td>
-                    <td>@odontologo.Apellido</td>
-                    <td>@odontologo.Especialidad</td>
-                    <td>@odontologo.Email</td>
-                    <td>
-                        <ul>
-                            @foreach (var horario in odontologo.OdontologoHorarios)
-                            {
-                                @foreach (var detalle in horario.Detalles)
-                                {
-                                    <li>
-                                        @Model.GetSpanishDayName(detalle.DiaSemana): @detalle.HoraInicio - @detalle.HoraFin
-                                        <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editHorarioModal"
-                                                onclick="populateHorarioEditForm(@detalle.Id, '@detalle.FechaInicio.ToString("yyyy-MM-dd")', '@detalle.FechaFin.ToString("yyyy-MM-dd")', '@detalle.HoraInicio', '@detalle.HoraFin')">
-                                            Editar
-                                        </button>
-                                        <form method="post" asp-page-handler="DeleteHorario" asp-route-id="@detalle.Id" style="display:inline;">
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este horario?');">Eliminar</button>
-                                        </form>
-                                    </li>
-                                }
-                            }
-                        </ul>
-                    </td>
-                    <td>
-                        <!-- Botón que abre el modal de edición -->
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal"
-                                onclick="populateEditForm(@odontologo.Id, '@odontologo.Nombre', '@odontologo.Apellido', '@odontologo.Especialidad', '@odontologo.Email')">
-                            Editar
-                        </button>
-                        <form method="post" asp-page-handler="Delete" asp-route-id="@odontologo.Id" style="display:inline;">
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este odontólogo?');">Eliminar</button>
-                        </form>
-                    </td>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Especialidad</th>
+                    <th>Email</th>
+                    <th>Horarios</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var odontologo in Model.Odontologos)
+                {
+                    <tr>
+                        <td>@odontologo.Nombre</td>
+                        <td>@odontologo.Apellido</td>
+                        <td>@odontologo.Especialidad</td>
+                        <td>@odontologo.Email</td>
+                        <td>
+                            <!-- Botón que despliega los horarios -->
+                            <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target="#collapseHorarios-@odontologo.Id" aria-expanded="false" aria-controls="collapseHorarios-@odontologo.Id">
+                                Mostrar Horarios
+                            </button>
+
+                            <!-- Contenido del acordeón (colapsado por defecto) -->
+                            <div id="collapseHorarios-@odontologo.Id" class="collapse">
+                                <ul>
+                                    @foreach (var horario in odontologo.OdontologoHorarios)
+                                    {
+                                        @foreach (var detalle in horario.Detalles)
+                                        {
+                                            <li class="horario-item">
+                                                @Model.GetSpanishDayName(detalle.DiaSemana): @detalle.HoraInicio - @detalle.HoraFin
+                                                <div class="horario-actions">
+                                                    <button type="button" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editHorarioModal"
+                                                            onclick="populateHorarioEditForm(@detalle.Id, '@detalle.FechaInicio.ToString("yyyy-MM-dd")', '@detalle.FechaFin.ToString("yyyy-MM-dd")', '@detalle.HoraInicio', '@detalle.HoraFin')">
+                                                        Editar
+                                                    </button>
+                                                    <form method="post" asp-page-handler="DeleteHorario" asp-route-id="@detalle.Id" style="display:inline;">
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este horario?');">Eliminar</button>
+                                                    </form>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Botón que abre el modal de edición -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal"
+                                    onclick="populateEditForm(@odontologo.Id, '@odontologo.Nombre', '@odontologo.Apellido', '@odontologo.Especialidad', '@odontologo.Email')">
+                                Editar
+                            </button>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@odontologo.Id" style="display:inline;">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Está seguro de que desea eliminar este odontólogo?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+
 }
 
 <h2>Agregar Nuevo Odontólogo</h2>
